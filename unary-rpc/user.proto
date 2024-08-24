@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "pb/";
+
+service User {
+  rpc AddUser(AddUserRequest) returns(AddUserResponse);
+  rpc GetUser(GetUserRequest) returns(GetUserResponse);
+}
+
+message AddUserRequest {
+  string id = 1;
+  int32 age = 2;
+  string name = 3;
+}
+
+message AddUserResponse {
+  string id = 1;
+  int32 age = 2;
+  string name = 3;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  string id = 1;
+  int32 age = 2;
+  string name = 3;
+}

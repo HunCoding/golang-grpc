@@ -1,4 +1,4 @@
-module github.com/HunCoding/golang-grpc
+module github.com/HunCoding/golang-grpc/unary-rpc
 
 go 1.21
 

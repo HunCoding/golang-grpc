@@ -2,35 +2,44 @@ package client
 
 import (
 	"context"
-	"log"
-	"time"
-
-	"github.com/HunCoding/golang-grpc/pb"
-
+	"fmt"
+	"github.com/HunCoding/golang-grpc/unary-rpc/pb"
 	"google.golang.org/grpc"
 )
 
-func RunClient() {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
+func Run() {
+	dial, err := grpc.Dial("fdjksal:50051", grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		panic(err)
 	}
-	defer conn.Close()
 
-	c := pb.NewUserServiceClient(conn)
+	defer dial.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	userClient := pb.NewUserClient(dial)
 
-	r, err := c.AddUser(ctx, &pb.AddUserRequest{Name: "Alice", Age: 30})
+	user, err := userClient.AddUser(context.Background(), &pb.AddUserRequest{
+		Id:   "1",
+		Age:  40,
+		Name: "Test",
+	})
 	if err != nil {
-		log.Fatalf("could not add user: %v", err)
+		panic(err)
 	}
-	log.Printf("User ID: %s added successfully", r.GetId())
+	fmt.Printf("First user created: %v\n", user)
 
-	user, err := c.GetUser(ctx, &pb.GetUserRequest{Id: r.GetId()})
+	user, err = userClient.AddUser(context.Background(), &pb.AddUserRequest{
+		Id:   "2",
+		Age:  42,
+		Name: "Test 2",
+	})
 	if err != nil {
-		log.Fatalf("could not get user: %v", err)
+		panic(err)
 	}
-	log.Printf("User: %s, Age: %d", user.GetName(), user.GetAge())
+	fmt.Printf("Second user created: %v\n", user)
+
+	getUserResponse, err := userClient.GetUser(context.Background(), &pb.GetUserRequest{Id: "2"})
+	if err != nil {
+		return
+	}
+	fmt.Printf("User returned from GetUser method: %v\n", getUserResponse)
 }
