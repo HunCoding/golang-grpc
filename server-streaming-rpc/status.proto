@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "pb/";
+
+service StatusService {
+  rpc StreamStatus (StreamRequest) returns (stream StreamResponse);
+}
+
+message StreamRequest {
+  string task_id = 1;
+}
+
+message StreamResponse {
+  string message = 1;
+  int64 progress = 2;
+}
