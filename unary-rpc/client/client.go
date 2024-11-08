@@ -27,7 +27,10 @@ func Run() {
 	userClient := pb.NewUserClient(dial)
 
 	for i := 0; i < 5; i++ {
-		loginResp, err := userClient.Login(context.Background(), &pb.LoginRequest{Username: "user", Password: "password"})
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+
+		loginResp, err := userClient.Login(ctx, &pb.LoginRequest{Username: "user", Password: "password"})
 		if err != nil {
 			log.Fatalf("Falha ao fazer login: %v", err)
 		}
@@ -35,7 +38,7 @@ func Run() {
 		log.Printf("Token JWT recebido: %s", token)
 
 		md := metadata.New(map[string]string{"authorization": "Bearer " + token})
-		ctx := metadata.NewOutgoingContext(context.Background(), md)
+		ctx = metadata.NewOutgoingContext(ctx, md)
 
 		user, err := userClient.AddUser(ctx, &pb.AddUserRequest{
 			Id:   "1",

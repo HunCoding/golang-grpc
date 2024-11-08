@@ -40,6 +40,7 @@ func Run() {
 			authInterceptor,
 			rateLimitInterceptor,
 			logInterceptor,
+			timeoutInterceptor,
 		)))
 	pb.RegisterUserServer(s, NewUserService())
 	reflection.Register(s)
@@ -168,4 +169,17 @@ func ChainUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) grpc.Un
 
 		return currentHandler(ctx, req)
 	}
+}
+
+func timeoutInterceptor(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
+	// Adicionando timeout no servidor
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	return handler(ctx, req)
 }
